@@ -39,6 +39,7 @@ import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
 import fr.paris.lutece.portal.service.daemon.Daemon;
+import fr.paris.lutece.portal.service.plugin.PluginService;
 
 /**
  * Job Class that delegates the job execution to a Lutece Daemon 
@@ -68,8 +69,15 @@ public class DaemonJob implements Job
     {
         try
         {
-            _daemon.run( );
-            context.setResult( _daemon.getLastRunLogs( ) );
+            if ( PluginService.isPluginEnable( _daemon.getPluginName( ) ) )
+            {
+                _daemon.run( );
+                context.setResult( _daemon.getLastRunLogs( ) );
+            }
+            else
+            {
+                context.setResult( "Plugin not enabled" );
+            }
         }
         catch( Exception e )
         {

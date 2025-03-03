@@ -102,7 +102,7 @@ public class QuartzCacheService extends AbstractCacheableService<String, JobExec
                 DaemonEntry entry = AppDaemonService.getDaemonEntry( result.getId( ) );
                 if ( null != entry )
                 {
-                    entry.setLastRunDate( result.getLastRunDate( ) );
+                    entry.setLastRunDate( result.getLastRunEndDate( ) );
                     entry.setLastRunLogs( result.getLastRunLogs( ) );
                 }
             }

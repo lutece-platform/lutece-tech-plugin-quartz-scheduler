@@ -33,12 +33,16 @@
  */
 package fr.paris.lutece.plugins.scheduler.quartz.job;
 
+import java.util.Date;
+
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.JobListener;
 
 import fr.paris.lutece.plugins.scheduler.quartz.Constants;
 import fr.paris.lutece.plugins.scheduler.quartz.service.DaemonEntryJobService;
+import fr.paris.lutece.portal.service.daemon.AppDaemonService;
+import fr.paris.lutece.portal.service.daemon.DaemonEntry;
 import jakarta.enterprise.inject.spi.CDI;
 
 public class DaemonEntryJobListener implements JobListener
@@ -55,6 +59,11 @@ public class DaemonEntryJobListener implements JobListener
     @Override
     public void jobToBeExecuted( JobExecutionContext context )
     {
+        String strDaemonKey = (String) context.getJobDetail( ).getJobDataMap( ).get( Constants.DAEMON_ENTRY_ID_JOB_MAP_KEY );
+        DaemonEntry entry = AppDaemonService.getDaemonEntry( strDaemonKey );
+        entry.setLastRunDate( new Date( ) );
+        entry.setLastRunEndDate( null );
+        entry.setInProgress( true );
     }
 
     @Override
@@ -65,11 +74,12 @@ public class DaemonEntryJobListener implements JobListener
     @Override
     public void jobWasExecuted( JobExecutionContext context, JobExecutionException jobException )
     {
+        String strDaemonKey = (String) context.getJobDetail( ).getJobDataMap( ).get( Constants.DAEMON_ENTRY_ID_JOB_MAP_KEY );
         if ( null != context.getResult( ) && context.getResult( ) instanceof String )
         {
-            String strDaemonKey = (String) context.getJobDetail( ).getJobDataMap( ).get( Constants.DAEMON_ENTRY_ID_JOB_MAP_KEY );
-            getDaemonEntryJobService( ).jobExecuted( new JobExecutionResult( strDaemonKey, context.getFireTime( ), (String) context.getResult( ) ) );
+            getDaemonEntryJobService( ).jobExecuted( new JobExecutionResult( strDaemonKey, new Date( ), (String) context.getResult( ) ) );
         }
+        AppDaemonService.getDaemonEntry( strDaemonKey ).setInProgress( false );
     }
 
     private synchronized DaemonEntryJobService getDaemonEntryJobService( )
