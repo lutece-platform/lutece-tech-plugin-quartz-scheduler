@@ -43,14 +43,14 @@ public class JobExecutionResult implements Serializable
 {
 
     private final String _strId;
-    private final Date _dateLastRunDate;
+    private final Date _dateLastRunEndDate;
     private final String _strLastRunLogs;
 
-    public JobExecutionResult( String strId, Date dateLastRunDate, String strLastRunLogs )
+    public JobExecutionResult( String strId, Date dateLastRunEndDate, String strLastRunLogs )
     {
         super( );
         this._strId = strId;
-        this._dateLastRunDate = dateLastRunDate;
+        this._dateLastRunEndDate = dateLastRunEndDate;
         this._strLastRunLogs = strLastRunLogs;
     }
 
@@ -59,9 +59,9 @@ public class JobExecutionResult implements Serializable
         return _strId;
     }
 
-    public Date getLastRunDate( )
+    public Date getLastRunEndDate( )
     {
-        return _dateLastRunDate;
+        return _dateLastRunEndDate;
     }
 
     public String getLastRunLogs( )
