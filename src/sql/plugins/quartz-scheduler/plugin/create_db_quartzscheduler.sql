@@ -1,3 +1,6 @@
+--liquibase formatted sql
+--changeset quartz-scheduler:create_db_quartzscheduler.sql
+--preconditions onFail:MARK_RAN onError:WARN
 DROP TABLE IF EXISTS qrtz_FIRED_TRIGGERS;
 DROP TABLE IF EXISTS qrtz_PAUSED_TRIGGER_GRPS;
 DROP TABLE IF EXISTS qrtz_SCHEDULER_STATE;
