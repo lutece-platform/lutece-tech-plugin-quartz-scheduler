@@ -36,11 +36,12 @@ package fr.paris.lutece.plugins.scheduler.quartz.service;
 import java.io.Serializable;
 
 import javax.cache.Cache;
-import javax.cache.configuration.FactoryBuilder;
+import javax.cache.configuration.Factory;
 import javax.cache.configuration.MutableCacheEntryListenerConfiguration;
 import javax.cache.configuration.MutableConfiguration;
 import javax.cache.event.CacheEntryCreatedListener;
 import javax.cache.event.CacheEntryEvent;
+import javax.cache.event.CacheEntryListener;
 import javax.cache.event.CacheEntryListenerException;
 import javax.cache.event.CacheEntryUpdatedListener;
 
@@ -72,14 +73,33 @@ public class QuartzCacheService extends AbstractCacheableService<String, JobExec
     {
         Cache<String, JobExecutionResult> cache = createCache( strCacheName,
                 new MutableConfiguration<String, JobExecutionResult>( ).setTypes( String.class, JobExecutionResult.class ) );
-        cache.registerCacheEntryListener(
-                new MutableCacheEntryListenerConfiguration<String, JobExecutionResult>(
-                        FactoryBuilder.factoryOf( new QuartzCacheEntryListener<String, JobExecutionResult>( ) ), null,
-                        false, false ) );
+            
+        Factory<CacheEntryListener<String, JobExecutionResult>> factory = 
+                new QuartzCacheEntryListenerFactory();
+        MutableCacheEntryListenerConfiguration<String, JobExecutionResult> listenerConfig =
+	        new MutableCacheEntryListenerConfiguration<>(
+	            factory,
+	            null,
+	            false,
+	            false
+	        );
+        cache.registerCacheEntryListener( listenerConfig );
         CacheService.registerCacheableService( this );
     }
+    
+    // Factory Class and static and sérialisable
+    private  static class QuartzCacheEntryListenerFactory 
+        implements Factory<CacheEntryListener<String, JobExecutionResult>> {
+        
+        private static final long serialVersionUID = 1L;
+        
+        @Override
+        public CacheEntryListener<String, JobExecutionResult> create() {
+            return new QuartzCacheEntryListener<>();
+        }
+    }
 
-    class QuartzCacheEntryListener<K, V> implements CacheEntryCreatedListener<K, V>, CacheEntryUpdatedListener<K, V>, Serializable
+    static class QuartzCacheEntryListener<K, V> implements CacheEntryCreatedListener<K, V>, CacheEntryUpdatedListener<K, V>, Serializable
     {
 
         @Override
