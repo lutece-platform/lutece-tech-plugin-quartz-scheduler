@@ -71,6 +71,7 @@ public class QuartzCacheService extends AbstractCacheableService<String, JobExec
     @Override
     public void initCache( String strCacheName )
     {
+        _bPreventGlobalReset = true;
         Cache<String, JobExecutionResult> cache = createCache( strCacheName,
                 new MutableConfiguration<String, JobExecutionResult>( ).setTypes( String.class, JobExecutionResult.class ) );
             
@@ -87,7 +88,7 @@ public class QuartzCacheService extends AbstractCacheableService<String, JobExec
         CacheService.registerCacheableService( this );
     }
     
-    // Factory Class and static and sérialisable
+    // Factory Class and static and serializable
     private  static class QuartzCacheEntryListenerFactory 
         implements Factory<CacheEntryListener<String, JobExecutionResult>> {
         
