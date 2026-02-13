@@ -62,4 +62,10 @@
         <jiraProjectName>QUARTZSCHEDULER</jiraProjectName>
         <jiraComponentId />
     </properties>
+    <scm>
+        <connection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-quartz-scheduler.git</connection>
+        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-quartz-scheduler.git</developerConnection>
+        <url>https://github.com/lutece-platform/lutece-tech-plugin-quartz-scheduler.git</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>
