@@ -47,7 +47,6 @@ import javax.cache.event.CacheEntryUpdatedListener;
 
 import fr.paris.lutece.plugins.scheduler.quartz.job.JobExecutionResult;
 import fr.paris.lutece.portal.service.cache.AbstractCacheableService;
-import fr.paris.lutece.portal.service.cache.CacheService;
 import fr.paris.lutece.portal.service.daemon.AppDaemonService;
 import fr.paris.lutece.portal.service.daemon.DaemonEntry;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -71,23 +70,38 @@ public class QuartzCacheService extends AbstractCacheableService<String, JobExec
     @Override
     public void initCache( String strCacheName )
     {
+        initCache( strCacheName, false );
+    }
+
+    /**
+     * Creates the cache when it is enabled (in database, or by bEnable when the back office enables it) and registers the
+     * listener that copies the job results of every instance into the local daemon entries: enabling the cache from the
+     * back office goes through this method too, so the listener is never lost.
+     *
+     * @param strCacheName
+     *            the cache name
+     * @param bEnable
+     *            true to create the cache whatever its status in database
+     */
+    @Override
+    public void initCache( String strCacheName, boolean bEnable )
+    {
         _bPreventGlobalReset = true;
         Cache<String, JobExecutionResult> cache = createCache( strCacheName,
-                new MutableConfiguration<String, JobExecutionResult>( ).setTypes( String.class, JobExecutionResult.class ) );
-            
-        Factory<CacheEntryListener<String, JobExecutionResult>> factory = 
-                new QuartzCacheEntryListenerFactory();
-        MutableCacheEntryListenerConfiguration<String, JobExecutionResult> listenerConfig =
-	        new MutableCacheEntryListenerConfiguration<>(
-	            factory,
-	            null,
-	            false,
-	            false
-	        );
-        cache.registerCacheEntryListener( listenerConfig );
-        CacheService.registerCacheableService( this );
+                new MutableConfiguration<String, JobExecutionResult>( ).setTypes( String.class, JobExecutionResult.class ), bEnable );
+        if ( cache != null )
+        {
+            try
+            {
+                cache.registerCacheEntryListener( new MutableCacheEntryListenerConfiguration<>( new QuartzCacheEntryListenerFactory( ), null, false, false ) );
+            }
+            catch( IllegalArgumentException e )
+            {
+                // the listener of this configuration is already registered on the cache
+            }
+        }
     }
-    
+
     // Factory Class and static and serializable
     private  static class QuartzCacheEntryListenerFactory 
         implements Factory<CacheEntryListener<String, JobExecutionResult>> {
