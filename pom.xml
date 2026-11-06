@@ -11,7 +11,7 @@
 
     <artifactId>plugin-quartz-scheduler</artifactId>
     <packaging>lutece-plugin</packaging>
-    <version>1.0.1-beta-01</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>Lutece quartz-scheduler plugin</name>
 
     <repositories>
